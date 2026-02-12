@@ -1,0 +1,10 @@
+Makefile
+README.md
+chichi.c
+final
+gg.c
+main
+main.c
+output.txt
+pp.c
+test.c

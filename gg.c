@@ -15,6 +15,26 @@ int mysln(char* c, int i){
 
 }
 
+void strip(char* c){
+	int len = strlen(c);
+	if(len == 0)
+		return;
+	int ind1 = 0;
+	int ind2 = 0;
+	for(int i = len - 1; c[i] == ' '; i--){
+		c[i] = '\0';
+	}
+	
+	while(c[ind2] == ' '){
+		ind2++;
+	}
+	for(ind2; c[ind2] != '\0';ind2++){
+		c[ind1++] = c[ind2];
+	}
+	c[ind1] = '\0';
+
+}
+
 int countspaces(char* c){
 	int count = 0;
 	for(int i = 0; c[i] != '\0'; i++){
@@ -31,6 +51,7 @@ void main(){
 	printf("Enter a string: ");
 	fgets(c,sizeof(c),stdin);
 	c[strcspn(c, "\n")] = '\0';
+	strip(c);
 
 //	from here we're going to try to separate the commands and the arguements
 	char command[STRINGSIZE];
@@ -61,11 +82,6 @@ void main(){
 		args[string_no++][string_ind] = '\0';
 		args[string_no] = NULL;
 
-		for(int k = 0; k < arg + 2; k++){
-			if(args[k] == NULL)
-				printf("NULL\n");
-			printf("%s ",args[k]);
-		}
 
 		int pid = fork();
 		if(pid == 0)
@@ -74,13 +90,15 @@ void main(){
 			wait(NULL);
 
 
-
+/*
 		int j = 0;
 		while(args[j] != NULL){
 			free(args[j]);
 			j++;
 		}
 		free(args);
+
+*/
 	}
 	else{
 		int pid2 = fork();
