@@ -21,7 +21,7 @@ void strip(char* c){
 		return;
 	int ind1 = 0;
 	int ind2 = 0;
-	for(int i = len - 1; c[i] == ' '; i--){
+	for(int i = len - 1; c[i] == ' ' && i >=0 ; i--){
 		c[i] = '\0';
 	}
 	
@@ -38,7 +38,7 @@ void strip(char* c){
 int countspaces(char* c){
 	int count = 0;
 	for(int i = 0; c[i] != '\0'; i++){
-		if(c[i] == ' ')
+		if(c[i] != ' ' && c[i + 1] == ' ')
 			count++;
 	}
 
@@ -72,7 +72,7 @@ int CheckForRightCrocodile(char* c){
 	int counter = 0;
 	for(int i = 0; c[i] != '\0'; i++){
 		if(c[i] == '<'){
-			if(c[i + 1] != '>')
+			if(c[i + 1] != '<')
 				counter++;
 			i++;
 		}
@@ -82,7 +82,7 @@ int CheckForRightCrocodile(char* c){
 }
 
 char** Tokenize(char* command, char* c, int i,int arg){
-		char** args = (char**) malloc(arg + 2);
+		char** args = (char**) malloc(sizeof(char*) * (arg + 2));
 		int string_no = 1;
 		int string_ind = 0;
 		args[0] = malloc(strlen(command) + 1); // changed to 2 form 1
@@ -90,9 +90,13 @@ char** Tokenize(char* command, char* c, int i,int arg){
 		args[1] = malloc(mysln(c,i) + 1);
 		for(i; c[i] != '\0'; i++){
 			if(c[i] == ' '){
+				while(c[i + 1] == ' '){
+					i++;
+				}
 				args[string_no++][string_ind] = '\0';
 				string_ind = 0;
 				args[string_no] = malloc(mysln(c,i + 1) + 1);
+				
 				continue;
 			}
 			args[string_no][string_ind++] = c[i];
@@ -109,6 +113,7 @@ bool vaild_check(int double_croc,int left,int right){
 				return true;
 			}
 		}
+		return false;
 	}
 	else{
 		if(left == 0){
@@ -116,6 +121,7 @@ bool vaild_check(int double_croc,int left,int right){
 				return true;
 			}
 		}
+		return false;
 	}
 }
 
@@ -135,8 +141,6 @@ void mainT(){
 	int left = CheckForLeftCrocodile(c);
 	int right = CheckForRightCrocodile(c);
 	bool valid = vaild_check(double_croc,left,right);
-
-	printf("Double croc = %d\nLeft = %d\nRight = %d\n",double_croc,left,right);
 
 	if(!valid){
 		printf("Not valid");
@@ -167,12 +171,6 @@ void mainT(){
 			return;
 		}
 
-
-
-
-
-
-
 		if(double_croc == 0 && left == 0 && right == 0){
 			int pid = fork();
 			if(pid == 0)
@@ -180,34 +178,91 @@ void mainT(){
 			if (pid != 0)
 				wait(NULL);
 		}
-		else if(left > 0){
+
+		if(right > 0){
 			char* filename;
-			for(int i = 0; i < arg + 2; i++){
-				if(args[i] == ">"){
+			for(int i = 0; args[i] != NULL; i++){
+				if(strcmp(args[i],"<") == 0){
 					filename = args[i + 1];
-					args[i] = NULL;
-					args[i + 1] = NULL;
+					if(left == 0 && double_croc == 0){
+						args[i] = NULL;
+					}
+					else{
+						args[i] = " ";
+					}
 					break;
 				}
 			}
-			int filep = open(filename,O_WRONLY | O_CREAT,0777);
-			dup2(filep,STDOUT_FILENO);
+			int fileid = open(filename,O_RDONLY);
+			if(fileid < 0){
+				printf("File not found");
+				return;
+			}
+
+			dup2(fileid,STDIN_FILENO);
+			if(left == 0 && double_croc == 0){
+				execvp(command,args);
+			}
+		}
+
+
+		if(left > 0){
+			char* filename;
+			for(int i = 0; args[i] != NULL; i++){
+
+				if(strcmp(args[i],">") == 0){
+					filename = args[i + 1];
+					args[i] = NULL;
+					break;
+				}
+			}
 			int pid3 = fork();
 			if(pid3 == 0){
+				printf("FIlename = %s\nAnd the args = ",filename);
+				for(int i = 0; args[i] != NULL; i++)
+					printf("%s ",args[i]);
+				printf("\n");
+				int filep = open(filename,O_WRONLY | O_CREAT,0777);
+//				close(filep);
+				dup2(filep,STDOUT_FILENO);
 				execvp(command,args);
+				exit(0);
+			}
+			else{
+				wait(NULL);
+			}
+		}
+		else if(double_croc > 0){
+			char* filename;
+			for(int i = 0; args[i] != NULL; i++){
+				if(strcmp(args[i],">>") == 0){
+					filename = args[i + 1];
+					args[i] = NULL;
+				}
+			}
+			int pid3 = fork();
+			if(pid3 == 0){
+				if(filename == NULL){
+					printf("No file");
+					return;
+				}
+				int file_double = open(filename,O_CREAT | O_WRONLY | O_APPEND,0777);
+				dup2(file_double,STDOUT_FILENO);
+				execvp(command,args);
+				exit(0);
 			}
 			else{
 				wait(NULL);
 			}
 		}
 
+
+
 	}
 	else{
 		if(strcmp(command,"cd") == 0){
 			chdir("..");
 		}
-
-
 
 		int pid2 = fork();
 		if(pid2 == 0){

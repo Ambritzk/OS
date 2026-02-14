@@ -27,7 +27,7 @@ void main(){
 	dup2(file,STDOUT_FILENO);
 	int pid = fork();
 	if(pid == 0);
-		execlp("ls","ls",NULL,NULL,NULL);
+		execlp("ls","ls",NULL,NULL);
 
 
 }
