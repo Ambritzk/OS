@@ -6,6 +6,7 @@
 #include<string.h>
 #include<unistd.h>
 #include<stdbool.h>
+#include<fcntl.h>
 #define STRINGSIZE 128
 int myStrLen(char* c){
 	int count = 0;
@@ -15,36 +16,19 @@ int myStrLen(char* c){
 
 }
 
-int* getarry(){
-	int arr[] = {1,2,3,4};
-	return arr;
-}
 
 void main(){
-	// char c[3] = "abc";
-	// char** cc= malloc(1);
-	// cc[0] = malloc(4);
-	// strcpy(cc[0],c);
-	// printf("%s, len = %ld",cc[0],strlen(cc[0]));
-
-	// free(cc[0]);
-	// free(cc);
 
 
-	// char** c = malloc(2);
-	// c[0] = "helllo";
-	// c[1] = "world";
+	int file = open("chichi.txt",O_WRONLY | O_CREAT,0777);
+	if(file == -1)
+		printf("Error in opening; file!");
 
-	// c = realloc(c,3);
-	// c[2] = "biatch";
+	dup2(file,STDOUT_FILENO);
+	int pid = fork();
+	if(pid == 0);
+		execlp("ls","ls",NULL,NULL,NULL);
 
-	// printf("%s %s %s\n",c[0],c[1],c[2]);
 
-	// printf("%ld\n",strlen(c[1]));
-	// free(c);
-
-	int arr[] = getarry();
-	for(int i = 0; i < 4; i++)
-		printf("%d",arr[i]);
 }
 

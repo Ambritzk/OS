@@ -1,4 +1,3 @@
-
 #include<stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -6,6 +5,7 @@
 #include<string.h>
 #include<unistd.h>
 #include<stdbool.h>
+#include<fcntl.h>
 #define STRINGSIZE 128
 int mysln(char* c, int i){
 	int count = 0;
@@ -45,29 +45,47 @@ int countspaces(char* c){
 	return count;
 }
 
-void main(){
-
-	char c[STRINGSIZE];
-	printf("Enter a string: ");
-	fgets(c,sizeof(c),stdin);
-	c[strcspn(c, "\n")] = '\0';
-	strip(c);
-
-//	from here we're going to try to separate the commands and the arguements
-	char command[STRINGSIZE];
-	int i = 0;
-	for(i; c[i] != '\0'; i++){
-		if(c[i] == ' ')
-			break;
-		command[i] = c[i];
+int CheckForDoubleCrocodile(char* c){
+	int counter = 0;
+	for(int i = 0; c[i] != '\0'; i++){
+		if(c[i] == '>' && c[i + 1] == '>'){
+			counter++;
+			i++;
+		}
 	}
-	command[i++] = '\0';
-	int arg = countspaces(c);
-	if(arg > 0){
+	
+	return counter;
+}
+int CheckForLeftCrocodile(char* c){
+	int counter = 0;
+	for(int i = 0; c[i] != '\0'; i++){
+		if(c[i] == '>'){
+			if(c[i + 1] != '>')
+				counter++;
+			i++;
+		}
+	}
+	
+	return counter;
+}
+int CheckForRightCrocodile(char* c){
+	int counter = 0;
+	for(int i = 0; c[i] != '\0'; i++){
+		if(c[i] == '<'){
+			if(c[i + 1] != '>')
+				counter++;
+			i++;
+		}
+	}
+	
+	return counter;
+}
+
+char** Tokenize(char* command, char* c, int i,int arg){
 		char** args = (char**) malloc(arg + 2);
 		int string_no = 1;
 		int string_ind = 0;
-		args[0] = malloc(strlen(command) + 1);
+		args[0] = malloc(strlen(command) + 1); // changed to 2 form 1
 		strcpy(args[0],command);
 		args[1] = malloc(mysln(c,i) + 1);
 		for(i; c[i] != '\0'; i++){
@@ -82,25 +100,115 @@ void main(){
 		args[string_no++][string_ind] = '\0';
 		args[string_no] = NULL;
 
-
-		int pid = fork();
-		if(pid == 0)
-			execvp(command,args);
-		if (pid != 0)
-			wait(NULL);
-
-
-/*
-		int j = 0;
-		while(args[j] != NULL){
-			free(args[j]);
-			j++;
+		return args;
+}
+bool vaild_check(int double_croc,int left,int right){
+	if(double_croc == 0){
+		if(left == 0 || left == 1){
+			if(right == 0 || right == 1){
+				return true;
+			}
 		}
-		free(args);
-
-*/
 	}
 	else{
+		if(left == 0){
+			if(right == 0 || right == 1){
+				return true;
+			}
+		}
+	}
+}
+
+void mainT(){
+
+	char cwd[STRINGSIZE];
+	char c[STRINGSIZE];
+	getcwd(cwd,STRINGSIZE);
+	printf("%s&",cwd);
+	fgets(c,sizeof(c),stdin);
+	c[strcspn(c, "\n")] = '\0';
+	strip(c);
+
+
+
+	int double_croc = CheckForDoubleCrocodile(c);
+	int left = CheckForLeftCrocodile(c);
+	int right = CheckForRightCrocodile(c);
+	bool valid = vaild_check(double_croc,left,right);
+
+	printf("Double croc = %d\nLeft = %d\nRight = %d\n",double_croc,left,right);
+
+	if(!valid){
+		printf("Not valid");
+		return;
+	}
+//	from here we're going to try to separate the commands and the arguements
+	char command[STRINGSIZE];
+	int i = 0;
+	for(i; c[i] != '\0'; i++){
+		if(c[i] == ' ')
+			break;
+		command[i] = c[i];
+	}
+	command[i++] = '\0';
+
+	if(strcmp(command,"exit") == 0){
+		printf("\nExit");
+		exit(0);
+	}
+
+	int arg = countspaces(c);
+
+	if(arg > 0){
+
+		char** args = Tokenize(command,c,i,arg);
+		if(strcmp(command,"cd") == 0){
+			chdir(args[1]);
+			return;
+		}
+
+
+
+
+
+
+
+		if(double_croc == 0 && left == 0 && right == 0){
+			int pid = fork();
+			if(pid == 0)
+				execvp(command,args);
+			if (pid != 0)
+				wait(NULL);
+		}
+		else if(left > 0){
+			char* filename;
+			for(int i = 0; i < arg + 2; i++){
+				if(args[i] == ">"){
+					filename = args[i + 1];
+					args[i] = NULL;
+					args[i + 1] = NULL;
+					break;
+				}
+			}
+			int filep = open(filename,O_WRONLY | O_CREAT,0777);
+			dup2(filep,STDOUT_FILENO);
+			int pid3 = fork();
+			if(pid3 == 0){
+				execvp(command,args);
+			}
+			else{
+				wait(NULL);
+			}
+		}
+
+	}
+	else{
+		if(strcmp(command,"cd") == 0){
+			chdir("..");
+		}
+
+
+
 		int pid2 = fork();
 		if(pid2 == 0){
 			execlp(command,command,NULL);
@@ -109,18 +217,15 @@ void main(){
 			wait(NULL);
 		}
 	}
-/*
-	int pid = fork();
-	if (pid == 0)
-		execvp(command,args);
-	if(pid != 0)
-		wait(NULL);
 
-*/
 
-//	printf("%s",command);
-//	for(int i = 0; i < arg_ind; i++)
-//		printf("%s",args[i]);
+
 
 }
 
+void main(){
+	while(true){
+		mainT();
+	}
+
+}

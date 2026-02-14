@@ -1,0 +1,41 @@
+1.txt
+Makefile
+README.md
+chichi.txt
+final
+gg.c
+h.txt
+house.txt
+log.txt
+main
+main.c
+output.txt
+pp.c
+q2.c
+random.c
+test.c
+1.txt
+Makefile
+README.md
+chichi.txt
+final
+gg.c
+h.txt
+house.txt
+log.txt
+main
+main.c
+output.txt
+pp.c
+q2.c
+random.c
+test.c
+
+    }
+    else
+    {
+        a =16;
+        printf("I love FASt. a = %d\n", a);
+    }
+    return 0;
+}
