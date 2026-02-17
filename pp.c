@@ -19,7 +19,7 @@ int myStrLen(char* c){
 
 void main(){
 
-
+/*
 	int file = open("chichi.txt",O_WRONLY | O_CREAT,0777);
 	if(file == -1)
 		printf("Error in opening; file!");
@@ -29,6 +29,12 @@ void main(){
 	if(pid == 0);
 		execlp("ls","ls",NULL,NULL);
 
+*/
 
+	char c[] = "            asdf                    adsfadsf dsfasdf";
+	char* ptr = strtok(c," ");
+	printf("%s ",ptr);
+	ptr = strtok(NULL," ");
+	printf("%s",ptr);
 }
 

@@ -24,7 +24,7 @@ void strip(char* c){
 	for(int i = len - 1; c[i] == ' ' && i >=0 ; i--){
 		c[i] = '\0';
 	}
-	
+
 	while(c[ind2] == ' '){
 		ind2++;
 	}
@@ -53,7 +53,7 @@ int CheckForDoubleCrocodile(char* c){
 			i++;
 		}
 	}
-	
+
 	return counter;
 }
 int CheckForLeftCrocodile(char* c){
@@ -65,7 +65,7 @@ int CheckForLeftCrocodile(char* c){
 			i++;
 		}
 	}
-	
+
 	return counter;
 }
 int CheckForRightCrocodile(char* c){
@@ -125,7 +125,7 @@ bool vaild_check(int double_croc,int left,int right){
 	}
 }
 
-void mainT(){
+int mainT(){
 
 	char cwd[STRINGSIZE];
 	char c[STRINGSIZE];
@@ -141,10 +141,10 @@ void mainT(){
 	int left = CheckForLeftCrocodile(c);
 	int right = CheckForRightCrocodile(c);
 	bool valid = vaild_check(double_croc,left,right);
-
+	printf("double = %d\nLeft = %d\nRight = %d\n",double_croc,left,right);
 	if(!valid){
 		printf("Not valid");
-		return;
+		return 0;
 	}
 //	from here we're going to try to separate the commands and the arguements
 	char command[STRINGSIZE];
@@ -157,8 +157,8 @@ void mainT(){
 	command[i++] = '\0';
 
 	if(strcmp(command,"exit") == 0){
-		printf("\nExit");
-		exit(0);
+		printf("\nExiting...");
+		return -1;
 	}
 
 	int arg = countspaces(c);
@@ -168,7 +168,7 @@ void mainT(){
 		char** args = Tokenize(command,c,i,arg);
 		if(strcmp(command,"cd") == 0){
 			chdir(args[1]);
-			return;
+			return 0;
 		}
 
 		if(double_croc == 0 && left == 0 && right == 0){
@@ -196,7 +196,7 @@ void mainT(){
 			int fileid = open(filename,O_RDONLY);
 			if(fileid < 0){
 				printf("File not found");
-				return;
+				return 0;
 			}
 
 			dup2(fileid,STDIN_FILENO);
@@ -244,7 +244,7 @@ void mainT(){
 			if(pid3 == 0){
 				if(filename == NULL){
 					printf("No file");
-					return;
+					return 0;
 				}
 				int file_double = open(filename,O_CREAT | O_WRONLY | O_APPEND,0777);
 				dup2(file_double,STDOUT_FILENO);
@@ -273,14 +273,15 @@ void mainT(){
 		}
 	}
 
-
+	return 0;
 
 
 }
 
 void main(){
-	while(true){
-		mainT();
+	int return_stat = 0;
+	while(true && return_stat != -1){
+		return_stat = mainT();
 	}
 
 }

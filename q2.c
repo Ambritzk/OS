@@ -8,9 +8,14 @@
 #include<stdbool.h>
 #define STRINGSIZE 128
 bool GhostExistsInRoom(char* room){
+
+    //convert string to lowercase
+    for(int i = 0; room[i] != '\0'; i++){
+	if(room[i] >= 'A' || room[i] <= 'Z')
+		room[i] +=32;
+    }
     char ghost[] = "ghost";
-    char GHOST[] = "GHOST";
-    return strstr(room,ghost) || strstr(room,GHOST);
+    return strstr(room,ghost);
     //strstr finds substring
 }
 
@@ -26,8 +31,8 @@ void AssignRoomsToInvestigators(char** lines, int size){
         int room_no = 0;
         bool isRepeated = false;
         //here we find a random number that hasn't already been assigned.
-        do{ 
-            isRepeated = false;            
+        do{
+            isRepeated = false;
             room_no = random() % size;
             for(int j = 0; j < asg_ind; j++){
                 if (room_no == assigned[j]){
@@ -37,12 +42,12 @@ void AssignRoomsToInvestigators(char** lines, int size){
         }while(isRepeated);
         //here we actually assign the room
         int pid = fork();
-        
+
         if(pid == 0){
             bool is_ghost_in_this_room = GhostExistsInRoom(lines[room_no]);
             if(is_ghost_in_this_room == true){
-                int roll = random() % 3;
-                if(roll != 0){
+                int roll = random() % 10;
+                if(roll > 3){
                   //  printf("Investigator %d saw a ghost in room:%d and escaped\n",i + 1, room_no);
 
                     fprintf(log,"Investigator %d found a ghost in room %d and escaped.\n",i + 1, room_no + 1);
@@ -61,7 +66,7 @@ void AssignRoomsToInvestigators(char** lines, int size){
         }
         //here we update the assigned list
         assigned[asg_ind++] = room_no;
-    
+
     }
 
     int status = 0;
@@ -74,7 +79,7 @@ void AssignRoomsToInvestigators(char** lines, int size){
         if(status == 0){
             printf("Investigator %d escaped\n", i + 1);
             survivors++;
-        }        
+        }
         else{
             printf("Investigator %d taken\n",i + 1);
         }
@@ -110,13 +115,6 @@ void main(){
         strcpy(lines[size++],buffer);
         buffer[0] = '\0';
     }
-    // printf("\nWe reached here");
-    // for(int i = 0; i < size; i++){
-    //     printf("%s ",lines[i]);
-    // }
-
-
-    
 
     AssignRoomsToInvestigators(lines,size);
 

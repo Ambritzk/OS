@@ -1,3 +1,1 @@
-Investigator 4 found a ghost in room 13 and escaped.
-Investigator 7 found a ghost in room 4 and escaped.
-Investigator 10 found a ghost in room 12 and escaped.
+Investigator 1 found a ghost in room 4 and escaped.

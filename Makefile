@@ -1,2 +1,2 @@
-final: gg.c
-	gcc -o final gg.c
+final: smth.c
+	gcc -o final smth.c
