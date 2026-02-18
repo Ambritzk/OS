@@ -48,13 +48,10 @@ void AssignRoomsToInvestigators(char** lines, int size){
             if(is_ghost_in_this_room == true){
                 int roll = random() % 10;
                 if(roll > 3){
-                  //  printf("Investigator %d saw a ghost in room:%d and escaped\n",i + 1, room_no);
-
                     fprintf(log,"Investigator %d found a ghost in room %d and escaped.\n",i + 1, room_no + 1);
                     exit(EXIT_SUCCESS);
                 }
                 else{
-                    //printf("Investigator %d got killed by a ghost in room %d\n",i + 1, room_no);
                     exit(EXIT_FAILURE);
                 }
             }
@@ -71,7 +68,7 @@ void AssignRoomsToInvestigators(char** lines, int size){
 
     int status = 0;
 
-    printf("------Final count-----\n");
+    printf("Final count:\n");
 
     int survivors = 0;
     for(int i = 0; i < size; i++){
@@ -99,8 +96,6 @@ void main(){
     FILE* file;
     char buffer[STRINGSIZE];
     char filename[] = "house.txt";
-//    printf("Enter file name:");
-//    fgets(filename,sizeof(filename),stdin);
     file = fopen(filename,"r");
     if(file == NULL){
         printf("Error. File not found\n");

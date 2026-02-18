@@ -132,22 +132,6 @@ bool vaild_check(int double_croc,int left,int right){
 
 
 
-// char* RemoveLeftCrocodile(char* carr,char* arrow){
-//     char* c = malloc(strlen(carr) + 1);
-//     strcpy(c,carr);
-
-
-//     char* piece = strtok(c,arrow);
-//     char* str = piece;
-//     while(piece != NULL){
-//         str = piece;
-//         piece = strtok(NULL,arrow);
-//     }
-//     strip(str);
-//     char* filename = strtok(str," ");
-//     return filename;
-    
-// }
 
 
 char* RemoveLeftCrocodile(char* carr, char* arrow){
@@ -163,7 +147,6 @@ char* RemoveLeftCrocodile(char* carr, char* arrow){
     strip(str);
     char* filename = strtok(str, " ");
 
-    // Copy result before freeing c
     char* result = malloc(strlen(filename) + 1);
     strcpy(result, filename);
     free(c);
@@ -206,7 +189,6 @@ void RemoveFileName(char* c, char* filename, char* arrow){
         }
     }
 
-    // Shift characters to remove filename
     int length = strlen(filename);
     if(c[i + length] == '\0'){
         for(int k = 0; k < length; k++) c[i++] = '\0';
@@ -231,9 +213,6 @@ int mainT(){
     int left = CheckForLeftArrow(prompt);
     int double_croc = CheckForDoubleArrow(prompt);
 
-    char left_arrow[] = "<"; // write
-    char right_arrow[] = ">"; //read
-    char double_arrow[] = "<<";
     char* filename;
     char* input_filename;
     bool valid = vaild_check(double_croc,left,right);
@@ -244,17 +223,28 @@ int mainT(){
 
     if(left > 0){
         input_filename = RemoveLeftCrocodile(prompt,"<");
+        if(input_filename == NULL){
+            printf("\nNo file specified");
+            return 0;
+        }
         RemoveFileName(prompt,input_filename, "<");
     }
     else if(double_croc > 0){
         filename = RemoveLeftCrocodile(prompt,">>");
+        if(filename == NULL){
+            printf("\nNo file specified");
+            return 0;
+        }
         RemoveFileName(prompt,filename, ">>");
     }
 
 
     if(right > 0){
         filename = RemoveLeftCrocodile(prompt,">");
-
+        if(filename == NULL){
+            printf("\nNo file specified");
+            return 0;
+        }
         RemoveFileName(prompt,filename, ">");
     }
 
@@ -284,7 +274,7 @@ int mainT(){
     }
     if(!fork()){
         if(right > 0){
-            int fd = open(filename,O_WRONLY | O_CREAT, 0777);
+            int fd = open(filename,O_WRONLY | O_CREAT | O_TRUNC, 0777);
             dup2(fd,STDOUT_FILENO);
         }
         else if(double_croc> 0){
