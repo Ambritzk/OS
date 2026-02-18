@@ -44,7 +44,7 @@ void strip(char* c){
 }
 
 
-int CheckForDoubleCrocodile(char* c){
+int CheckForDoubleArrow(char* c){
 	int counter = 0;
 	for(int i = 0; c[i] != '\0'; i++){
 		if(c[i] == '>' && c[i + 1] == '>'){
@@ -55,7 +55,7 @@ int CheckForDoubleCrocodile(char* c){
 
 	return counter;
 }
-int CheckForLeftCrocodile(char* c){
+int CheckForRightArrow(char* c){
 	int counter = 0;
 	for(int i = 0; c[i] != '\0'; i++){
 		if(c[i] == '>'){
@@ -67,7 +67,7 @@ int CheckForLeftCrocodile(char* c){
 
 	return counter;
 }
-int CheckForRightCrocodile(char* c){
+int CheckForLeftArrow(char* c){
 	int counter = 0;
 	for(int i = 0; c[i] != '\0'; i++){
 		if(c[i] == '<'){
@@ -118,149 +118,195 @@ char* getCommand(char* c){
 
 
 bool vaild_check(int double_croc,int left,int right){
-	if(double_croc == 0){
-		if(left == 0 || left == 1){
-			if(right == 0 || right == 1){
-				return true;
-			}
-		}
-		return false;
-	}
-	else{
-		if(left == 0){
-			if(right == 0 || right == 1){
-				return true;
-			}
-		}
-		return false;
-	}
+    bool initial_check = double_croc + right < 2;
+    if(!initial_check){
+        return false;
+    }
+
+    if(right > 1){
+        return false;
+    }
+    return true;
+
 }
 
 
 
-char* RemoveLeftCrocodile(char* carr,char* arrow){
+// char* RemoveLeftCrocodile(char* carr,char* arrow){
+//     char* c = malloc(strlen(carr) + 1);
+//     strcpy(c,carr);
+
+
+//     char* piece = strtok(c,arrow);
+//     char* str = piece;
+//     while(piece != NULL){
+//         str = piece;
+//         piece = strtok(NULL,arrow);
+//     }
+//     strip(str);
+//     char* filename = strtok(str," ");
+//     return filename;
+    
+// }
+
+
+char* RemoveLeftCrocodile(char* carr, char* arrow){
     char* c = malloc(strlen(carr) + 1);
-    strcpy(c,carr);
+    strcpy(c, carr);
 
-
-    char* piece = strtok(c,arrow);
+    char* piece = strtok(c, arrow);
     char* str = piece;
     while(piece != NULL){
         str = piece;
-        piece = strtok(NULL,arrow);
+        piece = strtok(NULL, arrow);
     }
     strip(str);
-    char* filename = strtok(str," ");
-    return filename;
-    
+    char* filename = strtok(str, " ");
+
+    // Copy result before freeing c
+    char* result = malloc(strlen(filename) + 1);
+    strcpy(result, filename);
+    free(c);
+    return result;
 }
-void RemoveFileName(char* c, char* filename){
-    int i = 0;
-    bool string_found = false;
-    for(i; c[i] != '\0'; i++){
-        if(c[i] == filename[0]){
-            string_found = true;
-            int j = 0;
-            for(j; j < strlen(filename); j++){
-                if(c[i + j] != filename[j]){
-                    string_found = false;
-                    break;
-                }
-            }
-            if(string_found){
-                break;
+void RemoveFileName(char* c, char* filename, char* arrow){
+    if(strcmp(arrow,"<") == 0){
+        for(int i = 0; c[i] != '\0'; i++){
+            if(c[i] == '<'){
+                c[i] = ' ';
             }
         }
     }
-
-    int length = strlen(filename);
-    if(c[i + length] == '\0'){
-        for(int k = 0; k < length; k++){
-            c[i++] = '\0';
+    else if(strcmp(arrow,">") == 0){
+        for(int i = 0; c[i] != '\0'; i++){
+            if(c[i] == '>'){
+                c[i] = ' ';
+            }
         }
     }
     else{
-        
-        while(c[i + length] != '\0'){
-            c[i] = c[i + length];
-            i++;
+        for(int i = 0; c[i] != '\0'; i++){
+            if(c[i] == '>' && c[i + 1] == '>'){
+                c[i] = ' ';
+                c[i + 1] = ' ';
+                i++;
+            }
         }
-        while(c[i] != '\0'){
-            c[i++] = '\0';
+    }
+
+    int i = 0;
+    bool string_found = false;
+    for(; c[i] != '\0'; i++){
+        if(c[i] == filename[0]){
+            string_found = true;
+            for(int j = 0; j < strlen(filename); j++){
+                if(c[i+j] != filename[j]){ string_found = false; break; }
+            }
+            if(string_found) break;
         }
     }
 
-    i = 0;
-    for(i; c[i] != '\0'; i++){
-        if(c[i] == '>'){
-            c[i] = ' ';
-            break;
-        }
+    // Shift characters to remove filename
+    int length = strlen(filename);
+    if(c[i + length] == '\0'){
+        for(int k = 0; k < length; k++) c[i++] = '\0';
+    } else {
+        while(c[i + length] != '\0'){ c[i] = c[i + length]; i++; }
+        while(c[i] != '\0') c[i++] = '\0';
     }
-    // int spaces = 0;
-    // for(int j = i; c[j] != ' '; j++){
-    //     spaces++;
-    // }
-    // spaces--;
-    // for(i; )
 
-
-    
+    strip(c);
 }
 
-void main(){
+int mainT(){
 
+    char currdir[128];
+    getcwd(currdir,128);
+    printf("\n%s& ",currdir);
     char prompt[128];
-    printf("Enter string:");
     fgets(prompt,sizeof(prompt),stdin);
 
 	prompt[strcspn(prompt, "\n")] = '\0';
-    int left = CheckForLeftCrocodile(prompt);
-    int right = CheckForRightCrocodile(prompt);
-    int double_croc = CheckForDoubleCrocodile(prompt);
-    char left_arrow[] = ">";
-    char right_arrow[] = "<";
+    int right = CheckForRightArrow(prompt);
+    int left = CheckForLeftArrow(prompt);
+    int double_croc = CheckForDoubleArrow(prompt);
+
+    char left_arrow[] = "<"; // write
+    char right_arrow[] = ">"; //read
     char double_arrow[] = "<<";
-    
+    char* filename;
+    char* input_filename;
     bool valid = vaild_check(double_croc,left,right);
-    if(!valid)
-        return;
+    if(!valid){
+        printf("Multiple redirections are not allowed\n");
+        return 0;
+    }
 
     if(left > 0){
-        
-        char* filename = RemoveLeftCrocodile(prompt,left_arrow);
-        printf("filename = %s\n",prompt);
-
-        RemoveFileName(prompt,filename);
-        printf("stripped = %s\n",prompt);
+        input_filename = RemoveLeftCrocodile(prompt,"<");
+        RemoveFileName(prompt,input_filename, "<");
     }
+    else if(double_croc > 0){
+        filename = RemoveLeftCrocodile(prompt,">>");
+        RemoveFileName(prompt,filename, ">>");
+    }
+
+
+    if(right > 0){
+        filename = RemoveLeftCrocodile(prompt,">");
+
+        RemoveFileName(prompt,filename, ">");
+    }
+
+
     int words = countWords(prompt);
-    printf("Words = %d\n",words);
     char* command = getCommand(prompt);
 
     char** args = smallerTokenizer(prompt, words);
 
-    // printf("Command = %s\n Args = ",command);
-    // for(int i = 0; i < words + 1; i++){
-    //     printf("%s, ",args[i]);
-    // }
-    printf("\n");
-
-    // for(int i = 0; i < words + 1; i++)
-    //     free(args[i]);
 
 
+
+
+    if(strcmp(command,"cd") == 0){
+        if(words == 1){
+            chdir("..");
+        }
+        else{
+            if(chdir(args[1]) != 0){
+                printf("Couldn't change directory");
+            }
+        }
+        return 0;
+    }
+    else if(strcmp(command,"exit") == 0){
+        return -1;
+    }
     if(!fork()){
+        if(right > 0){
+            int fd = open(filename,O_WRONLY | O_CREAT, 0777);
+            dup2(fd,STDOUT_FILENO);
+        }
+        else if(double_croc> 0){
+            int fd = open(filename,O_CREAT | O_WRONLY | O_APPEND, 0777);
+            dup2(fd,STDOUT_FILENO);
+        }
+        if(left > 0){
+            int fd = open(input_filename,O_RDONLY, 0777);
+            dup2(fd,STDIN_FILENO);            
+        }
         execvp(command,args);
     }
     else{
         wait(NULL);
     }
-    // free(command);
-    // free(args);
 
 }
 
-// > input.txt sort -r
-// sort > input.txt -r
-// sort -r < input.txt
+void main(){
+    while(true){
+        if(mainT() == -1){
+            break;
+        }
+    }
+}
