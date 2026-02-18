@@ -1,6 +1,4 @@
-
-Filename = house.txt
-t eerie space with flickering candlelight.
+Living Room: A cozy but eerie space with flickering candlelight.
 Kitchen: Old utensils clatter mysteriously in the dark.
 Library: Books float in the air as whispers echo through the room.
 Basement: A cold draft and distant screams make this room unsettling. (GHOST)  

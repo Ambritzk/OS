@@ -8,7 +8,6 @@
 #include<stdbool.h>
 #define STRINGSIZE 128
 bool GhostExistsInRoom(char* room){
-
     //convert string to lowercase
     for(int i = 0; room[i] != '\0'; i++){
 	if(room[i] >= 'A' || room[i] <= 'Z')
@@ -68,7 +67,7 @@ void AssignRoomsToInvestigators(char** lines, int size){
 
     int status = 0;
 
-    printf("Final count:\n");
+    printf("Summary:\n");
 
     int survivors = 0;
     for(int i = 0; i < size; i++){
