@@ -138,16 +138,16 @@ bool vaild_check(int double_croc,int left,int right){
 
 
 
-char* RemoveLeftCrocodile(char* carr){
+char* RemoveLeftCrocodile(char* carr,char* arrow){
     char* c = malloc(strlen(carr) + 1);
     strcpy(c,carr);
 
 
-    char* piece = strtok(c,">");
+    char* piece = strtok(c,arrow);
     char* str = piece;
     while(piece != NULL){
         str = piece;
-        piece = strtok(NULL,">");
+        piece = strtok(NULL,arrow);
     }
     strip(str);
     char* filename = strtok(str," ");
@@ -207,6 +207,7 @@ void RemoveFileName(char* c, char* filename){
 
     
 }
+
 void main(){
 
     char prompt[128];
@@ -217,6 +218,9 @@ void main(){
     int left = CheckForLeftCrocodile(prompt);
     int right = CheckForRightCrocodile(prompt);
     int double_croc = CheckForDoubleCrocodile(prompt);
+    char left_arrow[] = ">";
+    char right_arrow[] = "<";
+    char double_arrow[] = "<<";
     
     bool valid = vaild_check(double_croc,left,right);
     if(!valid)
@@ -224,7 +228,7 @@ void main(){
 
     if(left > 0){
         
-        char* filename = RemoveLeftCrocodile(prompt);
+        char* filename = RemoveLeftCrocodile(prompt,left_arrow);
         printf("filename = %s\n",prompt);
 
         RemoveFileName(prompt,filename);
